@@ -159,8 +159,21 @@ module ActsAsTenant
   end
 end
 
+module TenantedAfterCommit
+  def after_commit(&block)
+    current_tenant = ActsAsTenant.current_tenant
+
+    super do
+      ActsAsTenant.with_tenant(current_tenant, &block)
+    end
+  end
+end
+
 ActiveSupport.on_load(:active_record) do |base|
   base.include ActsAsTenant::ModelExtensions
+
+  require 'active_record/connection_adapters/abstract/transaction'
+  ActiveRecord::ConnectionAdapters::Transaction.prepend TenantedAfterCommit
 end
 
 ActiveSupport.on_load(:action_controller) do |base|

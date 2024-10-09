@@ -46,4 +46,9 @@ Rails.application.configure do
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
+
+  if Rails::VERSION::MAJOR >= 7 && Rails::VERSION::MINOR >= 2
+    # This is the default value for Rails 7.2
+    config.active_job.enqueue_after_transaction_commit = :default
+  end
 end
