@@ -487,6 +487,17 @@ describe ActsAsTenant do
     it "should not raise an error when no tenant is provided" do
       expect { ActsAsTenant.without_tenant { Project.all } }.to_not raise_error
     end
+
+    it 'preserves current_tenant for after_commit callback' do
+      expect do
+        Account.transaction do
+          ActsAsTenant.with_tenant(account) do
+            projects(:with_manager).update!(name: 'banana')
+          end
+        end
+        # after_commit is actually called here, outside of `with_tenant`
+      end.to_not raise_error
+    end
   end
 
   context "no tenant required" do

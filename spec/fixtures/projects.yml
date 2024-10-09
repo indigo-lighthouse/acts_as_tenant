@@ -8,3 +8,7 @@ foo:
 bar:
   account: bar
   name: bar
+
+with_manager:
+  account: foo
+  name: fuga

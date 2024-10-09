@@ -7,4 +7,12 @@ class Project < ActiveRecord::Base
   validates_uniqueness_to_tenant :name
 
   default_scope -> { where(deleted_at: nil) }
+
+  after_update_commit :notify_manager
+
+  private
+
+  def notify_manager
+    manager.touch
+  end
 end

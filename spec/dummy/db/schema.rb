@@ -30,6 +30,8 @@ ActiveRecord::Schema.define(version: 1) do
     t.column :name, :string
     t.column :project_id, :integer
     t.column :account_id, :integer
+    t.column :created_at, :timestamp
+    t.column :updated_at, :timestamp
   end
 
   create_table :tasks, force: true do |t|
