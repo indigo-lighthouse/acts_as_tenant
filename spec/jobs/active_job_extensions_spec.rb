@@ -35,6 +35,18 @@ RSpec.describe ApplicationTestJob, type: :job do
         expect { described_class.perform_later(expected_tenant: nil) }.to have_enqueued_job.on_queue("default")
         expect { perform_enqueued_jobs }.to raise_error(ActsAsTenant::Errors::NoTenantSet)
       end
+
+      # In Rails 7.2, job _enqueue_ happens after commit (by default),
+      # at which point we may be out of `with_tenant` block, and so the tenant is lost.
+      it 'current_tenant is preserved in jobs that are enqueued after commit' do
+        Account.transaction do
+          ActsAsTenant.with_tenant(account) do
+            account.update!(name: 'Bob')
+            described_class.perform_later(expected_tenant: account)
+          end
+        end
+        expect { perform_enqueued_jobs }.not_to raise_error
+      end
     end
 
     context "when tenant is not required" do
